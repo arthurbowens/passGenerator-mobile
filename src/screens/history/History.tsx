@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, ToastAndroid, Alert
 import { getPasswords, deletePassword } from "../../services/password/passwordService";
 import * as Clipboard from "expo-clipboard";
 import { useNavigation } from "@react-navigation/native";
+import Toast from 'react-native-toast-message';
 
 export default function History() {
   const [passwords, setPasswords] = useState<any[]>([]);
@@ -14,7 +15,11 @@ export default function History() {
       const data = await getPasswords();
       setPasswords(data || []);
     } catch (error) {
-      ToastAndroid.show("Erro ao obter itens", ToastAndroid.SHORT);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao obter itens',
+        text2: 'Não foi possível carregar sua lista de senhas'
+      });
     }
   };
 
@@ -49,7 +54,11 @@ export default function History() {
               await carregarSenhas(); // Recarrega a lista após excluir
               ToastAndroid.show("Senha excluída com sucesso!", ToastAndroid.SHORT);
             } catch (error) {
-              ToastAndroid.show("Erro ao excluir senha", ToastAndroid.SHORT);
+              Toast.show({
+                type: 'error',
+                text1: 'Erro ao excluir senha',
+                text2: 'Não foi possível excluir a senha'
+              });
             }
           }
         }

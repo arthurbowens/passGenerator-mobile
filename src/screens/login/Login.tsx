@@ -17,7 +17,20 @@ export default function Login({ navigation }) {
     try {
       await onLogin(email, senha);
     } catch (e) {
-      setError("E-mail ou senha inválidos ou erro inesperado.");
+      if (e.response) {
+        switch (e.response.status) {
+          case 401:
+            setError("Credenciais inválidas");
+            break;
+          case 404:
+            setError("Usuário não cadastrado");
+            break;
+          default:
+            setError("Erro ao fazer login. Tente novamente.");
+        }
+      } else {
+        setError("Erro ao fazer login. Tente novamente.");
+      }
     } finally {
       setLoading(false);
     }

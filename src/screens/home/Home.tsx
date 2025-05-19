@@ -52,21 +52,20 @@ export default function Home({ navigation }) {
   };
 
   const handleCriar = async () => {
-    console.log("Botão Criar pressionado");
     setModalError("");
     setSaving(true);
     try {
       await savePassword({ service: itemName.trim(), password });
       setModalVisible(false);
       setItemName("");
-      setSaving(false);
       navigation.navigate("History");
-    } catch (error: any) {
-      if (error.message && error.message.includes("existente")) {
-        setModalError("Nome do item já existente");
+    } catch (e) {
+      if (e.response && e.response.status === 409) {
+        setModalError("Já existe um item com este nome");
       } else {
-        setModalError("Erro ao salvar. Tente novamente.");
+        setModalError("Erro ao criar item. Tente novamente.");
       }
+    } finally {
       setSaving(false);
     }
   };
