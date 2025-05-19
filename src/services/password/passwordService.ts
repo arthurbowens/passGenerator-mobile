@@ -1,4 +1,4 @@
-import { getStorageItem, setStorageItem } from "../../utils/localStorage";
+const API_URL = "http://localhost:8080/passGenerator/item";
 
 export function gerarSenha(tamanho = 8) {
   const charset =
@@ -10,29 +10,30 @@ export function gerarSenha(tamanho = 8) {
   return senha;
 }
 
-export const savePassword = async (password: string) => {
-  try {
-    const saved = await getStorageItem("passwords");
-    const history = saved ? JSON.parse(saved) : [];
-
-    history.push(password);
-
-    await setStorageItem("passwords", JSON.stringify(history));
-  } catch (error) {
-    console.error("Erro ao salvar a senha.", error);
+// Salvar senha no backend
+export const savePassword = async (item: { service: string, password: string }) => {
+  const response = await fetch(`${API_URL}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nome: item.service, senha: item.password }),
+  });
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error || "Erro ao salvar");
   }
 };
 
-export const getPasswords = async (): Promise<string[]> => {
-  try {
-    const saved = await getStorageItem("passwords");
-    return saved ? JSON.parse(saved) : [];
-  } catch (error) {
-    console.error("Erro ao recuperar as senhas.", error);
-    return [];
-  }
+// Listar senhas do backend
+export const getPasswords = async () => {
+  const response = await fetch(`${API_URL}/items`);
+  if (!response.ok) throw new Error("Erro ao buscar itens");
+  return await response.json(); // [{id, nome, senha}, ...]
 };
 
-export const clearPasswords = async () => {
-  await setStorageItem("passwords", JSON.stringify([]));
+// Deletar senha do backend
+export const deletePassword = async (id: number) => {
+  const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Erro ao deletar");
 };
