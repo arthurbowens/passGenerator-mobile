@@ -13,15 +13,49 @@ export default function SignUp({ navigation }) {
   const [loading, setLoading] = useState(false);
   const { onRegister } = useAuth();
 
+  const formatDate = (dateStr: string) => {
+    // Convert from DD/MM/YYYY to YYYY-MM-DD
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isValidDate = (dateStr: string) => {
+    // Check if the date matches DD/MM/YYYY format
+    const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+    if (!dateRegex.test(dateStr)) return false;
+
+    const [day, month, year] = dateStr.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    return date.getDate() === day && 
+           date.getMonth() === month - 1 && 
+           date.getFullYear() === year;
+  };
+
+  const isValidEmail = (email: string) => {
+    // Regex para validar email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegister = async () => {
     setError("");
+    if (!isValidEmail(email)) {
+      setError("Email inválido. Use um formato válido como exemplo@dominio.com");
+      return;
+    }
     if (senha !== confirmarSenha) {
       setError("As senhas não coincidem.");
       return;
     }
+    if (!isValidDate(dataNascimento)) {
+      setError("Data de nascimento inválida. Use o formato DD/MM/AAAA.");
+      return;
+    }
     setLoading(true);
     try {
-      await onRegister(nome, email, senha, confirmarSenha, dataNascimento);
+      const formattedDate = formatDate(dataNascimento);
+      await onRegister(nome, email, senha, confirmarSenha, formattedDate);
       navigation.navigate("Login");
     } catch (e) {
       setError("Erro ao registrar. Tente novamente.");
@@ -51,6 +85,15 @@ export default function SignUp({ navigation }) {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#222"
+      />
+      <Text style={styles.label}>Data de Nascimento</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="DD/MM/AAAA"
+        value={dataNascimento}
+        onChangeText={setDataNascimento}
+        keyboardType="numeric"
         placeholderTextColor="#222"
       />
       <Text style={styles.label}>Senha</Text>

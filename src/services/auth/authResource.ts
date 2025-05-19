@@ -5,6 +5,7 @@ export type SignUpDTO = {
     email: string;
     password: string;
     confirmPassword: string;
+    birthday: string;
 }
 
 export const signIn = (email, password) => {

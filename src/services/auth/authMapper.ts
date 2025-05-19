@@ -2,20 +2,20 @@ import { SignUpDTO } from "./authResource";
 
 export const getSignUpDTO = (data: SignUpDTO) => {
     return {
-        name: data.name,
+        nome: data.name,
         email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-        birthday: data.birthday,
+        senha: data.password,
+        confirmacaoSenha: data.confirmPassword,
+        dataNascimento: data.birthday,
     };
 };
 
 export const getSigUpResponse = (data: any) => {
     return {
-        name: data.name,
+        name: data.nome,
         email: data.email,
-        birthday: new Date (data.birthday),
-        password: data.password,
-        confirmPassword: data.confirmPassword,
+        birthday: data.dataNascimento,
+        password: data.senha,
+        confirmPassword: data.confirmacaoSenha,
     };
 };
