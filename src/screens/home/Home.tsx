@@ -86,7 +86,7 @@ export default function Home({ navigation }) {
       <View style={styles.card}>
         <Text style={styles.title}>GERADOR DE SENHA</Text>
         <View style={styles.logoWrapper}>
-          <Image source={require("../../../assets/padlock-vector-icon-png_262163.jpg")} style={styles.logoImage} />
+          <Image source={require("../../../assets/cadeado.png")} style={styles.logoImage} />
         </View>
         <Text style={styles.passwordText}>{password || "Gere sua senha"}</Text>
         <TouchableOpacity style={styles.button} onPress={handleGerarSenha}>
