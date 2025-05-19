@@ -46,8 +46,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const token = await localStorage.getStorageItem(TOKEN_KEY);
 
       if (token) {
-        api.defaults.headers.common["Authorization"] = `${token}`;
-
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         setAuthState({
           token: token,
           authenticated: true,
@@ -82,12 +81,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (email: string, password: string) => {
     try {
       const result = await api.post("/auth/signin", { email, senha: password });
+      const token = result.data.token;
+      
+      if (!token) {
+        throw new Error("Token não recebido do servidor");
+      }
+
       setAuthState({
         authenticated: true,
-        token: result.data.token,
+        token: token,
       });
-      api.defaults.headers.common["Authorization"] = `${result.data.token}`;
-      await localStorage.setStorageItem(TOKEN_KEY, result.data.token);
+      
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      await localStorage.setStorageItem(TOKEN_KEY, token);
       return result.data;
     } catch (error) {
       console.error("Erro ao fazer login", error);
