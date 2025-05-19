@@ -79,17 +79,8 @@ export default function History() {
 
   return (
     <View style={styles.root}>
-      {/* AppBar */}
-      <View style={styles.appBar}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backArrow}>{"<"}</Text>
-        </TouchableOpacity>
-        <Text style={styles.appBarTitle}>Históricos de senhas</Text>
-        <View style={{ width: 24 }} />
-      </View>
       {/* Card central */}
       <View style={styles.card}>
-        <Text style={styles.title}>HISTÓRICO DE SENHAS</Text>
         {passwords.length === 0 ? (
           <Text style={styles.emptyText}>Nenhuma senha foi gerada</Text>
         ) : (
@@ -114,28 +105,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     paddingTop: 40,
   },
-  appBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    backgroundColor: "#f5f5f5",
-    justifyContent: "space-between",
-  },
-  backArrow: {
-    fontSize: 24,
-    color: "#222",
-    fontWeight: "bold",
-    width: 24,
-    textAlign: "left",
-  },
-  appBarTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#222",
-    flex: 1,
-    textAlign: "center",
-  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -149,13 +118,6 @@ const styles = StyleSheet.create({
     elevation: 4,
     flex: 1,
     justifyContent: "center",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#0074d9",
-    marginBottom: 16,
-    textAlign: "center",
   },
   emptyText: {
     fontSize: 16,
