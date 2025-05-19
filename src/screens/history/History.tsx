@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ToastAndroid } from "react-native";
-import { getPasswords, clearPasswords } from "../../services/password/passwordService";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ToastAndroid, Alert } from "react-native";
+import { getPasswords, deletePassword } from "../../services/password/passwordService";
 import * as Clipboard from "expo-clipboard";
 import { useNavigation } from "@react-navigation/native";
 
@@ -18,19 +18,6 @@ export default function History() {
     }
   };
 
-  const limparHistorico = () => {
-    Alert.alert("Confirmação", "Deseja apagar todo o histórico de senhas?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Limpar",
-        onPress: async () => {
-          await clearPasswords();
-          setPasswords([]);
-        },
-      },
-    ]);
-  };
-
   useEffect(() => {
     carregarSenhas();
   }, []);
@@ -44,41 +31,46 @@ export default function History() {
     }
   };
 
-  const handleDelete = async (index: number) => {
-    try {
-      const newList = passwords.filter((_, i) => i !== index);
-      setPasswords(newList);
-      // Atualiza storage
-      await clearPasswords();
-      for (const item of newList) {
-        await getPasswords().then(async (list) => {
-          if (!list.some((l: any) => l.service === item.service)) {
-            await getPasswords().then(async () => {
-              // re-salva cada item
-              await import("../../services/password/passwordService").then(mod => mod.savePassword(item));
-            });
+  const handleDelete = async (id: number) => {
+    Alert.alert(
+      "Confirmar exclusão",
+      "Deseja realmente excluir esta senha?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deletePassword(id);
+              await carregarSenhas(); // Recarrega a lista após excluir
+              ToastAndroid.show("Senha excluída com sucesso!", ToastAndroid.SHORT);
+            } catch (error) {
+              ToastAndroid.show("Erro ao excluir senha", ToastAndroid.SHORT);
+            }
           }
-        });
-      }
-    } catch (error) {
-      ToastAndroid.show("Erro ao remover item", ToastAndroid.SHORT);
-    }
+        }
+      ]
+    );
   };
 
   const renderPassword = ({ item, index }: { item: any, index: number }) => (
     <View style={styles.passwordCard}>
-      <Text style={styles.passwordService}>{item.service}</Text>
+      <Text style={styles.passwordService}>{item.nome}</Text>
       <Text style={styles.passwordMasked}>
-        {showPasswordIndex === index ? item.password : "********"}
+        {showPasswordIndex === index ? item.senha : "********"}
       </Text>
       <View style={styles.emojiRow}>
         <TouchableOpacity onPress={() => setShowPasswordIndex(showPasswordIndex === index ? null : index)}>
           <Text style={styles.emoji}>{showPasswordIndex === index ? "🙈" : "👁️"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCopy(item.password)}>
+        <TouchableOpacity onPress={() => handleCopy(item.senha)}>
           <Text style={styles.emoji}>📋</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDelete(index)}>
+        <TouchableOpacity onPress={() => handleDelete(item.id)}>
           <Text style={styles.emoji}>🗑️</Text>
         </TouchableOpacity>
       </View>
@@ -103,7 +95,7 @@ export default function History() {
         ) : (
           <FlatList
             data={passwords}
-            keyExtractor={(_, index) => index.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={renderPassword}
             contentContainerStyle={{ alignItems: "center" }}
           />
