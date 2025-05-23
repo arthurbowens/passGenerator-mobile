@@ -36,12 +36,12 @@ app.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('Erro na resposta:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      headers: error.response?.headers
-    });
+    // console.error('Erro na resposta:', {
+    //   status: error.response?.status,
+    //   statusText: error.response?.statusText,
+    //   data: error.response?.data,
+    //   headers: error.response?.headers
+    // });
     return Promise.reject(error);
   }
 );

@@ -14,12 +14,17 @@ export default function History() {
     try {
       const data = await getPasswords();
       setPasswords(data || []);
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Erro ao obter itens',
-        text2: 'Não foi possível carregar sua lista de senhas'
-      });
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        // Se não houver senhas, apenas inicializa com array vazio
+        setPasswords([]);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Erro ao obter itens',
+          text2: 'Não foi possível carregar sua lista de senhas'
+        });
+      }
     }
   };
 
@@ -87,98 +92,77 @@ export default function History() {
   );
 
   return (
-    <View style={styles.root}>
-      {/* Card central */}
-      <View style={styles.card}>
-        {passwords.length === 0 ? (
-          <Text style={styles.emptyText}>Nenhuma senha foi gerada</Text>
-        ) : (
-          <FlatList
-            data={passwords}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderPassword}
-            contentContainerStyle={{ alignItems: "center" }}
-          />
-        )}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>VOLTAR</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      {passwords.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Você ainda não tem senhas salvas</Text>
+          <Text style={styles.emptySubText}>Gere uma senha na tela inicial para começar</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={passwords}
+          renderItem={renderPassword}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
+  container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    paddingTop: 40,
+    backgroundColor: '#f5f5f5',
   },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    margin: 16,
-    padding: 24,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    flex: 1,
-    justifyContent: "center",
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#222",
-    marginVertical: 24,
-    textAlign: "center",
+  list: {
+    padding: 16,
   },
   passwordCard: {
-    borderWidth: 2,
-    borderColor: "#222",
-    borderRadius: 8,
+    backgroundColor: 'white',
     padding: 16,
-    marginVertical: 8,
-    width: 220,
-    backgroundColor: "#fff",
-    alignItems: "flex-start",
+    borderRadius: 8,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   passwordService: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
   passwordMasked: {
     fontSize: 16,
-    marginBottom: 8,
+    color: '#666',
+    marginBottom: 12,
   },
   emojiRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    width: "100%",
-    gap: 8,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 16,
   },
   emoji: {
+    fontSize: 24,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
     fontSize: 18,
-    marginHorizontal: 2,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  button: {
-    backgroundColor: "#2196f3",
-    borderRadius: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 32,
-    alignItems: "center",
-    marginTop: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  emptySubText: {
     fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
   },
 });

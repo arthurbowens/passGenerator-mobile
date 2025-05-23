@@ -51,7 +51,21 @@ export const getPasswords = async () => {
     const response = await api.get('/item/items');
     console.log('Resposta do servidor:', response.data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response?.status === 403) {
+      console.error('Erro detalhado ao buscar senhas:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      throw new Error("Sessão expirada ou token inválido. Por favor, faça login novamente.");
+    } else if (error.response?.status === 404) {
+      // Não loga erro no console para 404 (nenhum item encontrado)
+      return [];
+    }
+    
+    // Loga outros erros que não sejam 404 ou 403
     console.error('Erro detalhado ao buscar senhas:', {
       status: error.response?.status,
       statusText: error.response?.statusText,
@@ -59,9 +73,6 @@ export const getPasswords = async () => {
       headers: error.response?.headers
     });
     
-    if (error.response?.status === 403) {
-      throw new Error("Sessão expirada ou token inválido. Por favor, faça login novamente.");
-    }
     throw new Error("Erro ao buscar itens");
   }
 };
