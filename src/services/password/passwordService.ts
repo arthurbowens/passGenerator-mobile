@@ -97,3 +97,22 @@ export const deletePassword = async (id: number) => {
     throw new Error("Erro ao deletar");
   }
 };
+
+// Deletar todos os itens do backend
+export const deleteAllPasswords = async () => {
+  try {
+    console.log('Token atual:', api.defaults.headers.common["Authorization"]);
+    await api.delete('/item/todos');
+  } catch (error) {
+    console.error('Erro detalhado ao deletar todos:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers
+    });
+    if (error.response?.status === 403) {
+      throw new Error("Sessão expirada ou token inválido. Por favor, faça login novamente.");
+    }
+    throw new Error("Erro ao deletar todos os itens");
+  }
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ToastAndroid, Alert } from "react-native";
-import { getPasswords, deletePassword } from "../../services/password/passwordService";
+import { getPasswords, deletePassword, deleteAllPasswords } from "../../services/password/passwordService";
 import * as Clipboard from "expo-clipboard";
 import { useNavigation } from "@react-navigation/native";
 import Toast from 'react-native-toast-message';
@@ -71,6 +71,33 @@ export default function History() {
     );
   };
 
+  const handleDeleteAll = async () => {
+    Alert.alert(
+      "Excluir todos",
+      "Tem certeza que deseja excluir todos os itens?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir todos",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteAllPasswords();
+              await carregarSenhas();
+              ToastAndroid.show("Todos os itens foram excluídos!", ToastAndroid.SHORT);
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: 'Erro ao excluir todos',
+                text2: 'Não foi possível excluir todos os itens'
+              });
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderPassword = ({ item, index }: { item: any, index: number }) => (
     <View style={styles.passwordCard}>
       <Text style={styles.passwordService}>{item.nome}</Text>
@@ -99,12 +126,26 @@ export default function History() {
           <Text style={styles.emptySubText}>Gere uma senha na tela inicial para começar</Text>
         </View>
       ) : (
-        <FlatList
-          data={passwords}
-          renderItem={renderPassword}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.list}
-        />
+        <>
+          <TouchableOpacity
+            style={{
+              backgroundColor: 'red',
+              padding: 12,
+              borderRadius: 8,
+              margin: 16,
+              alignItems: 'center',
+            }}
+            onPress={handleDeleteAll}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Excluir Todos</Text>
+          </TouchableOpacity>
+          <FlatList
+            data={passwords}
+            renderItem={renderPassword}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.list}
+          />
+        </>
       )}
     </View>
   );
